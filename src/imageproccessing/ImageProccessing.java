@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package imageproccessing;
+package ImageProcessing;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,10 +18,10 @@ import java.util.Collections;
 public class ImageProccessing {
 
     static ArrayList<String> arrangedData = new ArrayList<>();
-
+    static String fileName = "yoda.tif";
     public static void main(String[] args) throws FileNotFoundException {
         String formatHeader = "%-15s %-15s"; // formatter
-        String fileName = "yoda.tif";
+        
         try (FileInputStream myInputFile = new FileInputStream(fileName)) {
             String byteOrder = String.format("%02x", myInputFile.read()) + String.format("%02x", myInputFile.read());
             System.out.println(String.format(formatHeader, "File Name", ":" + fileName));
@@ -79,7 +79,9 @@ public class ImageProccessing {
                 System.out.println(finalOutput);
             }
             System.out.println("-----------------------------Image  Data-----------------------------");
-            System.out.println("(Corrected Version)(LSB/MSB)");
+            for (int o = getStripOffSet; o < arrangedData.size(); o += 2) {
+                    Collections.swap(arrangedData, o, o + 1);
+                }
             int count = 0;
             for (int b = getStripOffSet; b < arrangedData.size(); b++) {
                 System.out.print(arrangedData.get(b) + " ");
@@ -98,13 +100,24 @@ public class ImageProccessing {
     static void checkByteOrder(String byteOrder) {
         if ("4949".equals(byteOrder)) {
             try {
-                FileInputStream myInputFile = new FileInputStream("yoda.tif");
+                FileInputStream myInputFile = new FileInputStream(fileName);
                 int value;
                 while ((value = myInputFile.read()) != -1) {
                     arrangedData.add(String.format("%02x", value).toUpperCase()); //add all data to arrayList
                 }
                 for (int o = 0; o < arrangedData.size(); o += 2) {
                     Collections.swap(arrangedData, o, o + 1);
+                }
+            } catch (IOException ex) {
+                System.out.print("File Error!\n" + ex);
+            }
+        }
+        else {
+            try {
+                FileInputStream myInputFile = new FileInputStream(fileName);
+                int value;
+                while ((value = myInputFile.read()) != -1) {
+                    arrangedData.add(String.format("%02x", value).toUpperCase()); //add all data to arrayList
                 }
             } catch (IOException ex) {
                 System.out.print("File Error!\n" + ex);
